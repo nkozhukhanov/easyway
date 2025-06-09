@@ -1,0 +1,48 @@
+---
+description: "Target file structure"
+alwaysApply: true
+---
+
+## Папка → назначение
+
+| Папка | Назначение |
+|-------|-----------|
+| **src/** | Исходный TypeScript‑код Telegram‑бота |
+| **src/handlers/** | Обработчики входящих обновлений (локация, live‑локация) |
+| **src/services/** | Интеграции (OpenAI SDK, вспомогательные Telegram‑вызовы) |
+| **src/scheduler/** | Логика таймера для live‑локаций и периодических задач |
+| **src/types/** | Общие типы и интерфейсы для строгой типизации |
+| **config/** | Статичные конфигурационные файлы (.env.example, eslint, prettier) |
+| **scripts/** | Вспомогательные скрипты (сборка, деплой, генерация данных) |
+| **docker/** | Dockerfile и файлы окружения контейнера |
+| **.github/workflows/** | Файлы CI/CD — автодеплой на Railway |
+| **dist/** | Скомпилированный JS‑билд (генерируется `tsc`, не коммитим) |
+
+---
+
+## Главные файлы
+
+| Файл | Зачем нужен |
+|------|-------------|
+| `package.json` | Декларация зависимостей npm и скриптов проекта |
+| `tsconfig.json` | Настройки компиляции TypeScript → JavaScript |
+| `src/index.ts` | Точка входа: инициализация Telegraf‑бота и роутинг |
+| `src/openai.ts` | Клиент OpenAI: формирование prompt и вызов `chat.completions` |
+| `src/handlers/locationHandler.ts` | Обработка одноразовых локаций и отправка факта |
+| `src/handlers/liveLocationHandler.ts` | Запуск и остановка live‑локационной сессии |
+| `src/scheduler/liveLocationScheduler.ts` | Планировщик фактов каждые 10 мин, управление таймером |
+| `Dockerfile` | Сборка образа Node 20 + установка зависимостей |
+| `.railway/config.json` | Параметры среды и деплоя Railway |
+| `.eslintrc.js` | Правила линтинга для поддержки код‑стайла |
+| `.prettierrc` | Конфигурация Prettier для автоформатирования |
+| `.env.example` | Шаблон переменных окружения (TOKENS, PORT) |
+| `README.md` | Мини‑инструкция по локальному запуску и деплою |
+
+---
+
+## Генерируй новые файлы здесь
+
+- `src/handlers/`
+- `src/services/`
+- `src/scheduler/`
+- `scripts/`

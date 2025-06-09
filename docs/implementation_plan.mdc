@@ -1,0 +1,66 @@
+---
+description: "Implementation Plan"
+alwaysApply: false
+---
+
+> **Статус**: у каждого пункта есть статус (TODO / DONE). Начинай работу с первого невыполненного.
+
+## Milestone 1 — Project Scaffolding & Environment
+
+- TODO: Создать репозиторий на GitHub с публичной лицензией MIT  
+- TODO: Добавить `.gitignore` **до** первого коммита (должен игнорировать `.env`, `__pycache__`, `dist/`, `venv/`)  
+- TODO: Сгенерировать `pyproject.toml` (Python 3.12, `python-telegram-bot`, `openai`, `python-dotenv`)  
+- TODO: Установить зависимости `pip install -e .` в editable‑режиме  
+- TODO: Добавить базовую структуру каталогов из `file_structure_document.mdc`  
+- TODO: Создать `.env.example` с переменными `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`  
+- TODO: Подключить `black` и `flake8` (pre‑commit) для автоформатирования и линтинга  
+- TODO: Создать файл `src/bot.py` с заглушкой приложения PTB **без** `asyncio.run()`  
+- TODO: Первый чистый коммит «feat: project scaffold»
+
+## Milestone 2 — Core Bot (MVP v 1.0)
+
+- TODO: Реализовать `src/openai_client.py` (функция `get_fact(latitude, longitude)`)  
+- TODO: Создать `src/handlers/location_handler.py` для одноразовой локации `(MessageHandler(filters.LOCATION, …))`  
+- TODO: Прописать prompt: «Найди **один** малоизвестный факт о месте в радиусе 500 м… ≤300 символов»  
+- TODO: Обработать ошибки OpenAI (rate limit, invalid request) с fallback‑ответом  
+- TODO: Загрузить переменные окружения через `python‑dotenv` в `main()`  
+- TODO: Добавить юнит‑тесты (`pytest`) для генерации prompt и радиуса поиска  
+- TODO: Провести ручной тест в личном чате с ботом  
+- TODO: Тег `v1.0` и пуш в `main`
+
+## Milestone 3 — Containerisation & Deployment
+
+- TODO: Написать `Dockerfile` на базе `python:3.12-slim`  
+  1. `COPY pyproject.toml ./`  
+  2. `COPY src/ ./src/`  **до** `pip install -e .`  
+  3. `RUN pip install --no-cache-dir -e .`  
+- TODO: Создать `.dockerignore` (исключить `.git`, `tests/`, `venv/`, `cache`)  
+- TODO: Проверить локальный билд `docker build` и запуск контейнера  
+- TODO: Добавить Railway‑service, настроить secrets, порт, healthcheck  
+- TODO: Настроить GitHub Actions workflow: build → push → deploy to Railway  
+- TODO: Подтвердить работоспособность бота в проде  
+
+## Milestone 4 — Live Location Feature (v 1.1)
+
+- TODO: Реализовать `src/handlers/live_location_handler.py` с `MessageHandler(filters.StatusUpdate.LIVE_LOCATION, …)`  
+- TODO: Добавить `JobQueue` PTB на 10‑минутный интервал, передавать координаты в `get_fact()`  
+- TODO: Дедуплицировать факты: хранить последний факт на этот `chat_id` + гео в in‑memory dict  
+- TODO: Остановить задачу по истечении `live_period` или по команде пользователя  
+- TODO: Обновить `README.md`: инструкции для live‑локации и обновлённые переменные  
+- TODO: Тег `v1.1`, релиз и проверка в проде  
+
+---
+
+## Acceptance Checklist
+
+- [ ] Бот отвечает на одноразовую локацию фактом ≤5 сек  
+- [ ] Live‑режим присылает новый факт каждые 10 мин, не повторяет прежние  
+- [ ] Секреты не попадают в репозиторий (проверка git history)  
+- [ ] `.gitignore` содержит `.env` и `__pycache__`  
+- [ ] Docker‑образ < 300 MB и старт < 5 сек  
+- [ ] Релиз Railway триггерится из GitHub и проходит без ошибок  
+- [ ] Все задачи в этом файле отмечены **DONE** с комментарием от Cursor  
+
+---
+
+> **@Cursor**: После завершения задачи поменяй её статус на DONE и добавь краткий маркер «// done by Cursor» с описанием, что именно сделано.

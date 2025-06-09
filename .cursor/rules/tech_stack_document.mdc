@@ -1,0 +1,8 @@
+| Layer | Library / Service & Version | Purpose (1 line) | Official Docs |
+|-------|----------------------------|------------------|---------------|
+| Runtime | **Node.js 20 LTS** (≈ 20.13) | JavaScript/TypeScript execution environment for the bot code. | <https://nodejs.org/en/docs/> |
+| Bot SDK | **Telegraf 4.18.2** | Simplifies handling Telegram Bot API updates and routing messages. | <https://telegraf.js.org/> |
+| OpenAI SDK | **openai 5.x** (Node) | Makes typed calls to GPT‑4.1‑mini via `chat.completions`. | <https://github.com/openai/openai-node> |
+| Database | **— (не требуется)** | Storage is unnecessary for MVP; facts are generated on‑the‑fly. | — |
+| Deployment | **Railway (2025‑05)** + Docker | CI/CD hosting platform to build and run the containerised bot 24/7. | <https://docs.railway.app/> |
+| Linter / Formatter | **ESLint 9.0.0** + **Prettier 3.3.1** | Enforce code quality and consistent style in the TypeScript codebase. | <https://eslint.org/> / <https://prettier.io/docs/en/> |
