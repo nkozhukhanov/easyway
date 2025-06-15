@@ -9,7 +9,7 @@ COPY package*.json ./
 COPY tsconfig.json ./
 
 # Устанавливаем зависимости
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Копируем исходный код
 COPY src/ ./src/
