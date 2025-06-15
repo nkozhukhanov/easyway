@@ -13,7 +13,7 @@ export interface LiveLocationSession {
   lastFact?: string;
   startTime: Date;
   endTime?: Date;
-  intervalId?: NodeJS.Timer;
+  intervalId?: NodeJS.Timeout;
 }
 
 export interface FactRequest {
