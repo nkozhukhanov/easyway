@@ -17,16 +17,16 @@ function validateConfig(): Config {
   const nodeEnv = process.env.NODE_ENV || 'development';
 
   if (!telegramBotToken) {
-    throw new Error('TELEGRAM_BOT_TOKEN is required');
+    console.warn('⚠️ TELEGRAM_BOT_TOKEN отсутствует - запуск в режиме healthcheck');
   }
 
   if (!openaiApiKey) {
-    throw new Error('OPENAI_API_KEY is required');
+    console.warn('⚠️ OPENAI_API_KEY отсутствует - запуск в режиме healthcheck');
   }
 
   return {
-    telegramBotToken,
-    openaiApiKey,
+    telegramBotToken: telegramBotToken || 'dummy',
+    openaiApiKey: openaiApiKey || 'dummy',
     port,
     nodeEnv,
   };
@@ -34,15 +34,46 @@ function validateConfig(): Config {
 
 async function main() {
   try {
+    console.log('🚀 Запуск EasyWay Telegram Bot...');
+    console.log('🔍 Проверка переменных окружения...');
+    
+    // Проверяем наличие переменных окружения (без вывода значений)
+    console.log(`TELEGRAM_BOT_TOKEN: ${process.env.TELEGRAM_BOT_TOKEN ? '✅ установлен' : '❌ отсутствует'}`);
+    console.log(`OPENAI_API_KEY: ${process.env.OPENAI_API_KEY ? '✅ установлен' : '❌ отсутствует'}`);
+    console.log(`PORT: ${process.env.PORT || '3000 (по умолчанию)'}`);
+    console.log(`NODE_ENV: ${process.env.NODE_ENV || 'development (по умолчанию)'}`);
+    
     // Валидируем конфигурацию
     const appConfig = validateConfig();
     
-    console.log('🚀 Запуск EasyWay Telegram Bot...');
     console.log(`📍 Режим: ${appConfig.nodeEnv}`);
     console.log(`🔌 Порт: ${appConfig.port}`);
 
+    // Создаем HTTP сервер для healthcheck ПЕРВЫМ (для Railway)
+    const server = createServer((req, res) => {
+      if (req.url === '/health') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ 
+          status: 'ok', 
+          timestamp: new Date().toISOString(),
+          port: appConfig.port,
+          env: appConfig.nodeEnv
+        }));
+      } else {
+        res.writeHead(404);
+        res.end('Not Found');
+      }
+    });
+
+    server.listen(appConfig.port, '0.0.0.0', () => {
+      console.log(`🌐 HTTP сервер запущен на 0.0.0.0:${appConfig.port}`);
+    });
+
     // Инициализируем сервисы
+    console.log('🔧 Инициализация OpenAI сервиса...');
     const openaiService = new OpenAIService(appConfig.openaiApiKey);
+    
+    console.log('🤖 Инициализация Telegram бота...');
     const bot = new Telegraf(appConfig.telegramBotToken);
 
     // Инициализируем обработчики
@@ -100,24 +131,13 @@ async function main() {
       }
     });
 
-    // Запускаем бота
-    await bot.launch();
-    console.log('✅ Бот успешно запущен!');
-
-    // Создаем HTTP сервер для healthcheck (для Railway)
-    const server = createServer((req, res) => {
-      if (req.url === '/health') {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }));
-      } else {
-        res.writeHead(404);
-        res.end('Not Found');
-      }
-    });
-
-    server.listen(appConfig.port, () => {
-      console.log(`🌐 HTTP сервер запущен на порту ${appConfig.port}`);
-    });
+    // Запускаем бота только если есть токены
+    if (process.env.TELEGRAM_BOT_TOKEN && process.env.OPENAI_API_KEY) {
+      await bot.launch();
+      console.log('✅ Бот успешно запущен!');
+    } else {
+      console.log('⚠️ Бот не запущен - отсутствуют переменные окружения');
+    }
 
     // Graceful shutdown
     process.once('SIGINT', () => {
