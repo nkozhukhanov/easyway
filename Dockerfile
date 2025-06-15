@@ -8,14 +8,17 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Устанавливаем зависимости
-RUN npm install --omit=dev
+# Устанавливаем все зависимости, включая dev-зависимости
+RUN npm install
 
 # Копируем исходный код
 COPY src/ ./src/
 
-# Компилируем TypeScript в JavaScript
+# Собираем проект
 RUN npm run build
+
+# Удаляем dev-зависимости
+RUN npm prune --omit=dev
 
 # Создаем пользователя для безопасности
 RUN addgroup -g 1001 -S nodejs && \
